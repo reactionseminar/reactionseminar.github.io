@@ -33,14 +33,17 @@ layout: compress
     {% endif %} 
 
     {% include analytics.html %}
+    {% include performance.html %}
+    {% include china-fallback.html %}
+    {% include maps-china.html %}
     
-    <script src="/js/jquery-2.1.1.min.js"></script>
+    <script src="/js/jquery-2.1.1.min.js" async></script>
 <!-- 
     <script>
         window.jQuery || document.write('<script src="{{ "/js/jquery-2.1.1.min.js" | prepend: site.baseurl }}><\/script>')
     </script>
  -->
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js" async></script>
     <script>
     if (typeof($.fn.modal) === 'undefined') {
         document.write('<script src="{{ "/js/bootstrap.min.js" | prepend: site.baseurl }}><\/script>')

@@ -8,6 +8,15 @@ markdown: kramdown
 permalink: pretty
 exclude: ['/automation/', 'README.md', 'LICENSE.txt', 'CNAME']
 
+# Performance optimizations
+sass:
+  style: compressed
+compress_html:
+  clippings: all
+  comments: all
+  endings: all
+  blanklines: false
+
 
 # Site Settings
 title: "Reaction Seminar"
