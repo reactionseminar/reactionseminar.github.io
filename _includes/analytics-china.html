@@ -1,0 +1,31 @@
+<!-- China-accessible analytics alternative -->
+<script>
+// Simple analytics fallback for China users
+(function() {
+    // Test if Google Analytics is blocked
+    var gaBlocked = false;
+    var img = new Image();
+    img.onload = function() { gaBlocked = false; };
+    img.onerror = function() { gaBlocked = true; };
+    img.src = 'https://www.google-analytics.com/collect?v=1&t=pageview&tid=UA-161771703-1&cid=555&dp=' + encodeURIComponent(location.pathname);
+    
+    // Fallback analytics for China
+    setTimeout(function() {
+        if (gaBlocked) {
+            // Send basic analytics to a China-accessible endpoint
+            fetch('/analytics-fallback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    page: location.pathname,
+                    timestamp: Date.now(),
+                    userAgent: navigator.userAgent.substring(0, 100)
+                })
+            }).catch(function() {
+                // Silent fail if analytics endpoint not available
+                console.log('Analytics fallback not available');
+            });
+        }
+    }, 1000);
+})();
+</script>

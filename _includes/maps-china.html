@@ -1,0 +1,63 @@
+<!-- China-accessible map alternative using OpenStreetMap -->
+<script>
+// Check if Google Maps is accessible
+function initChinaMaps() {
+    var mapsBlocked = false;
+    
+    // Test Google Maps availability
+    var testScript = document.createElement('script');
+    testScript.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&callback=initGoogleMaps';
+    testScript.onerror = function() {
+        mapsBlocked = true;
+        loadOpenStreetMap();
+    };
+    
+    // Fallback timeout
+    setTimeout(function() {
+        if (mapsBlocked || typeof google === 'undefined') {
+            loadOpenStreetMap();
+        }
+    }, 3000);
+    
+    document.head.appendChild(testScript);
+}
+
+function loadOpenStreetMap() {
+    // Remove any existing Google Maps
+    var googleMapContainer = document.getElementById('location-map');
+    if (googleMapContainer) {
+        googleMapContainer.innerHTML = '<div id="openstreetmap" style="height: 400px; width: 100%;"></div>';
+        
+        // Load Leaflet for OpenStreetMap
+        var leafletCSS = document.createElement('link');
+        leafletCSS.rel = 'stylesheet';
+        leafletCSS.href = 'https://unpkg.com/leaflet@1.7.1/dist/leaflet.css';
+        document.head.appendChild(leafletCSS);
+        
+        var leafletJS = document.createElement('script');
+        leafletJS.src = 'https://unpkg.com/leaflet@1.7.1/dist/leaflet.js';
+        leafletJS.onload = function() {
+            // Initialize OpenStreetMap
+            var map = L.map('openstreetmap').setView([51.505, -0.09], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            
+            // Add marker if coordinates are available
+            if (typeof eventPlaceCoordinates !== 'undefined') {
+                var coords = eventPlaceCoordinates.split(',');
+                if (coords.length === 2) {
+                    map.setView([parseFloat(coords[0]), parseFloat(coords[1])], 15);
+                    L.marker([parseFloat(coords[0]), parseFloat(coords[1])]).addTo(map);
+                }
+            }
+        };
+        document.head.appendChild(leafletJS);
+    }
+}
+
+// Only run if we're in China or Google is blocked
+if (navigator.language.includes('zh') || location.search.includes('china=1')) {
+    initChinaMaps();
+}
+</script>

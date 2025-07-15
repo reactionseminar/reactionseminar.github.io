@@ -1,0 +1,77 @@
+<!-- China accessibility detection and fallback system -->
+<script>
+(function() {
+    'use strict';
+    
+    // Detect if user is likely in China
+    function isChinaUser() {
+        // Check timezone
+        var timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        var chinaTimezones = ['Asia/Shanghai', 'Asia/Beijing', 'Asia/Chongqing', 'Asia/Harbin', 'Asia/Kashgar', 'Asia/Urumqi'];
+        
+        // Check language
+        var language = navigator.language || navigator.userLanguage;
+        var isChinese = language && (language.startsWith('zh') || language.includes('CN'));
+        
+        // Check URL parameter override
+        var urlParams = new URLSearchParams(window.location.search);
+        var chinaMode = urlParams.get('china') === '1';
+        
+        return chinaTimezones.includes(timezone) || isChinese || chinaMode;
+    }
+    
+    // Test if Google services are accessible
+    function testGoogleAccess(callback) {
+        var img = new Image();
+        var timeout = setTimeout(function() {
+            callback(false); // Assume blocked if timeout
+        }, 3000);
+        
+        img.onload = function() {
+            clearTimeout(timeout);
+            callback(true);
+        };
+        
+        img.onerror = function() {
+            clearTimeout(timeout);
+            callback(false);
+        };
+        
+        img.src = 'https://www.google.com/favicon.ico?' + Date.now();
+    }
+    
+    // Initialize China-friendly alternatives
+    function initChinaAlternatives() {
+        console.log('Initializing China-friendly alternatives...');
+        
+        // Replace Google Analytics
+        if (document.querySelector('script[src*="googletagmanager"]')) {
+            var analyticsScript = document.createElement('script');
+            analyticsScript.textContent = '{% include analytics-china.html %}';
+            document.head.appendChild(analyticsScript);
+        }
+        
+        // Initialize maps fallback
+        if (typeof initChinaMaps === 'function') {
+            initChinaMaps();
+        }
+        
+        // Add China mode indicator
+        var chinaIndicator = document.createElement('div');
+        chinaIndicator.innerHTML = '<small style="position:fixed;bottom:5px;right:5px;background:rgba(0,0,0,0.7);color:white;padding:2px 5px;border-radius:3px;font-size:10px;z-index:9999;">中国优化模式</small>';
+        document.body.appendChild(chinaIndicator);
+    }
+    
+    // Main initialization
+    if (isChinaUser()) {
+        testGoogleAccess(function(accessible) {
+            if (!accessible) {
+                initChinaAlternatives();
+            }
+        });
+    }
+    
+    // Manual activation via console
+    window.enableChinaMode = initChinaAlternatives;
+})();
+</script>
